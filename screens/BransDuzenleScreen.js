@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, Platform } from 'react-native';
 
 export default function BransDuzenleScreen({ route, navigation }) {
   const { branchId } = route.params;
@@ -41,6 +41,21 @@ export default function BransDuzenleScreen({ route, navigation }) {
     }
   };
 
+  // Silme fonksiyonu doğru yerde
+  const handleSil = async () => {
+    try {
+      const resp = await fetch(`http://localhost:4000/api/branches/${branchId}`, {
+        method: 'DELETE',
+      });
+      if (!resp.ok) throw new Error('Sunucu hatası');
+      Alert.alert('Başarılı', 'Branş silindi');
+      navigation.goBack();
+    } catch (err) {
+      Alert.alert('Hata', err.message);
+    }
+  };
+
+
   if (!brans) return <Text style={{ margin: 20 }}>Yükleniyor...</Text>;
 
   return (
@@ -51,32 +66,26 @@ export default function BransDuzenleScreen({ route, navigation }) {
       <Button title="Kaydet" onPress={handleKaydet} color="#1565c0" />
       <View style={{ height: 10 }} />
       <Button title="Sil" color="#c62828" onPress={() => {
-        Alert.alert(
-          'Dikkat',
-          'Bu branşı silmek istediğinize emin misiniz?',
-          [
-            { text: 'Vazgeç', style: 'cancel' },
-            { text: 'Sil', style: 'destructive', onPress: handleSil }
-          ]
-        );
+        if (Platform.OS === 'web') {
+          if (window.confirm('Bu branşı silmek istediğinize emin misiniz?')) {
+            handleSil();
+          }
+        } else {
+          Alert.alert(
+            'Dikkat',
+            'Bu branşı silmek istediğinize emin misiniz?',
+            [
+              { text: 'Vazgeç', style: 'cancel' },
+              { text: 'Sil', style: 'destructive', onPress: handleSil }
+            ]
+          );
+        }
       }} />
     </ScrollView>
   );
 }
 
-// Silme fonksiyonu
-async function handleSil() {
-  try {
-    const resp = await fetch(`http://localhost:4000/api/branches/${branchId}`, {
-      method: 'DELETE',
-    });
-    if (!resp.ok) throw new Error('Sunucu hatası');
-    Alert.alert('Başarılı', 'Branş silindi');
-    navigation.goBack();
-  } catch (err) {
-    Alert.alert('Hata', err.message);
-  }
-}
+
 
 const styles = StyleSheet.create({
   container: {
