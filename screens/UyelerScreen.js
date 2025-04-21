@@ -68,7 +68,7 @@ export default function UyelerScreen() {
         )}
         ListEmptyComponent={!loading && <Text>Hiç üye bulunamadı.</Text>}
       />
-      <Button title="Yeni Üye Ekle" onPress={() => Alert.alert('Yakında', 'Üye ekleme özelliği yakında eklenecek.')} />
+      <Button title="Yeni Üye Ekle" onPress={() => navigation.navigate('UyeEkle')} />
     </View>
   );
 }

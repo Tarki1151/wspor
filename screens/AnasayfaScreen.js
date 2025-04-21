@@ -1,20 +1,32 @@
 import React from 'react';
 import { View, Text, StyleSheet, Button, Image } from 'react-native';
 
+import { useNavigation } from '@react-navigation/native';
+
 export default function AnasayfaScreen() {
+  const navigation = useNavigation();
+  const [summary, setSummary] = React.useState({ total_members: '...', new_members: '...', today_classes: '...' });
+
+  React.useEffect(() => {
+    fetch('http://localhost:4000/api/summary')
+      .then(res => res.json())
+      .then(data => setSummary(data))
+      .catch(() => setSummary({ total_members: '-', new_members: '-', today_classes: '-' }));
+  }, []);
+
   return (
     <View style={styles.container}>
       <Image source={require('../assets/TARABYA MARTE-250x.png')} style={styles.logo} resizeMode="contain" />
       <Text style={styles.title}>Hoşgeldiniz!</Text>
       <Text style={styles.subtitle}>Bugünkü Özet</Text>
       <View style={styles.summaryBox}>
-        <Text style={styles.summaryText}>Aktif Üye: 120</Text>
-        <Text style={styles.summaryText}>Yeni Kayıt: 3</Text>
-        <Text style={styles.summaryText}>Bugünkü Dersler: 4</Text>
+        <Text style={styles.summaryText}>Aktif Üye: {summary.total_members}</Text>
+        <Text style={styles.summaryText}>Yeni Kayıt: {summary.new_members}</Text>
+        <Text style={styles.summaryText}>Bugünkü Dersler: {summary.today_classes}</Text>
       </View>
       <View style={styles.buttonGroup}>
-        <View style={styles.buttonWrapper}><Button title="Yeni Üye Ekle" onPress={() => {}} /></View>
-        <View style={styles.buttonWrapper}><Button title="Ders Planla" onPress={() => {}} /></View>
+        <View style={styles.buttonWrapper}><Button title="Yeni Üye Ekle" onPress={() => navigation.navigate('Üyeler', { screen: 'UyeEkle' })} /></View>
+        <View style={styles.buttonWrapper}><Button title="Ders Planla" onPress={() => navigation.navigate('Takvim')} /></View>
         <View style={styles.buttonWrapper}><Button title="Rapor Oluştur" onPress={() => {}} /></View>
       </View>
     </View>

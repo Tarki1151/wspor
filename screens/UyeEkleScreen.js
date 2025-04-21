@@ -33,39 +33,12 @@ export default function UyeEkleScreen({ navigation }) {
       <TextInput style={styles.input} placeholder="Adres" value={address} onChangeText={setAddress} />
       <TextInput style={styles.input} placeholder="Doğum Tarihi (YYYY-MM-DD)" value={dateOfBirth} onChangeText={setDateOfBirth} />
       <Button title="Ekle" onPress={handleEkle} color="#1565c0" />
-      {/* Düzenleme modunda ise sil butonu gösterilebilir */}
-      {memberId && (
-        <>
-          <View style={{ height: 10 }} />
-          <Button title="Sil" color="#c62828" onPress={() => {
-            Alert.alert(
-              'Dikkat',
-              'Bu üyeyi silmek istediğinize emin misiniz?',
-              [
-                { text: 'Vazgeç', style: 'cancel' },
-                { text: 'Sil', style: 'destructive', onPress: handleSil }
-              ]
-            );
-          }} />
-        </>
-      )}
+
     </ScrollView>
   );
 }
 
-// Silme fonksiyonu
-async function handleSil() {
-  try {
-    const resp = await fetch(`http://localhost:4000/api/members/${memberId}`, {
-      method: 'DELETE',
-    });
-    if (!resp.ok) throw new Error('Sunucu hatası');
-    Alert.alert('Başarılı', 'Üye silindi');
-    navigation.goBack();
-  } catch (err) {
-    Alert.alert('Hata', err.message);
-  }
-}
+
 
 const styles = StyleSheet.create({
   container: {

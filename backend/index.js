@@ -20,6 +20,32 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
   }
 });
 
+// --- Classes ve Attendance tabloları için migration ---
+db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS Classes (
+    class_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    branch_id INTEGER NOT NULL,
+    date TEXT NOT NULL,
+    time_slot TEXT NOT NULL CHECK(time_slot IN ('morning','afternoon','evening')),
+    instructor_id INTEGER,
+    capacity INTEGER,
+    FOREIGN KEY (branch_id) REFERENCES Sports_Branches(branch_id) ON DELETE RESTRICT,
+    FOREIGN KEY (instructor_id) REFERENCES Users(user_id) ON DELETE SET NULL
+  )`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_classes_date_branch ON Classes(date, branch_id)`);
+
+  db.run(`CREATE TABLE IF NOT EXISTS Attendance (
+    attendance_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    class_id INTEGER NOT NULL,
+    member_id INTEGER NOT NULL,
+    attended INTEGER NOT NULL DEFAULT 1,
+    FOREIGN KEY (class_id) REFERENCES Classes(class_id) ON DELETE CASCADE,
+    FOREIGN KEY (member_id) REFERENCES Members(member_id) ON DELETE CASCADE
+  )`);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_attendance_class_member ON Attendance(class_id, member_id)`);
+  db.run(`CREATE UNIQUE INDEX IF NOT EXISTS idx_attendance_unique ON Attendance(class_id, member_id)`);
+});
+
 // Üyeleri listele
 app.get('/api/members', (req, res) => {
   const q = req.query.q || '';
@@ -280,6 +306,90 @@ app.get('/api/member-packages/:member_id', (req, res) => {
   );
 });
 
+// --- Classes Endpoints ---
+// List classes (optionally filter by branch_id and/or date)
+app.get('/api/classes', (req, res) => {
+  const { branch_id, date } = req.query;
+  let sql = 'SELECT * FROM Classes WHERE 1=1';
+  const params = [];
+  if (branch_id) {
+    sql += ' AND branch_id = ?';
+    params.push(branch_id);
+  }
+  if (date) {
+    sql += ' AND date = ?';
+    params.push(date);
+  }
+  sql += ' ORDER BY date, time_slot';
+  db.all(sql, params, (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
+// Create class
+app.post('/api/classes', (req, res) => {
+  const { branch_id, date, time_slot, instructor_id, capacity } = req.body;
+  if (!branch_id || !date || !time_slot) return res.status(400).json({ error: 'Zorunlu alanlar eksik.' });
+  db.run(
+    `INSERT INTO Classes (branch_id, date, time_slot, instructor_id, capacity) VALUES (?, ?, ?, ?, ?)`,
+    [branch_id, date, time_slot, instructor_id, capacity],
+    function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ class_id: this.lastID });
+    }
+  );
+});
+// Update class
+app.put('/api/classes/:class_id', (req, res) => {
+  const { branch_id, date, time_slot, instructor_id, capacity } = req.body;
+  db.run(
+    `UPDATE Classes SET branch_id=?, date=?, time_slot=?, instructor_id=?, capacity=? WHERE class_id=?`,
+    [branch_id, date, time_slot, instructor_id, capacity, req.params.class_id],
+    function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ updated: this.changes });
+    }
+  );
+});
+// Delete class
+app.delete('/api/classes/:class_id', (req, res) => {
+  db.run(
+    `DELETE FROM Classes WHERE class_id=?`,
+    [req.params.class_id],
+    function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ deleted: this.changes });
+    }
+  );
+});
+// List attendance for a class
+app.get('/api/classes/:class_id/attendance', (req, res) => {
+  db.all(
+    `SELECT a.*, m.name as member_name FROM Attendance a JOIN Members m ON a.member_id = m.member_id WHERE a.class_id = ?`,
+    [req.params.class_id],
+    (err, rows) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(rows);
+    }
+  );
+});
+// Bulk add/update attendance for a class
+app.post('/api/classes/:class_id/attendance', (req, res) => {
+  const { attendance } = req.body; // [{member_id, attended}]
+  if (!Array.isArray(attendance)) return res.status(400).json({ error: 'attendance array zorunludur.' });
+  const class_id = req.params.class_id;
+  db.serialize(() => {
+    attendance.forEach(({ member_id, attended }) => {
+      db.run(
+        `INSERT INTO Attendance (class_id, member_id, attended) VALUES (?, ?, ?)
+         ON CONFLICT(class_id, member_id) DO UPDATE SET attended=excluded.attended`,
+        [class_id, member_id, attended == null ? 1 : attended]
+      );
+    });
+  });
+  res.json({ status: 'ok' });
+});
+
 // --- SEED endpoint: örnek veri ekle ---
 app.post('/api/seed', (req, res) => {
   db.serialize(() => {
@@ -291,11 +401,32 @@ app.post('/api/seed', (req, res) => {
     db.run(`INSERT INTO Members (name, phone, email, address, date_of_birth, registration_date) VALUES
       ('Zeynep Korkmaz', '5552223344', 'zeynep@spor.com', 'Ankara', '1992-05-12', '2025-04-20'),
       ('Mehmet Yıldız', '5553334455', 'mehmet@spor.com', 'İzmir', '1988-03-08', '2025-04-20')`);
-    db.run(`INSERT INTO Member_Groups (member_id, group_id) VALUES (1, 1), (2, 2)`);
-    db.run(`INSERT INTO Member_Sports_Branches (member_id, branch_id) VALUES (1, 1), (1, 2), (2, 2)`);
+    db.run(`INSERT OR IGNORE INTO Member_Groups (member_id, group_id) VALUES (1, 1), (2, 2)`);
+    db.run(`INSERT OR IGNORE INTO Member_Sports_Branches (member_id, branch_id) VALUES (1, 1), (1, 2), (2, 2)`);
     db.run(`INSERT INTO Member_Packages (member_id, package_id, start_date, end_date, classes_remaining) VALUES (1, 1, '2025-04-20', '2025-05-20', NULL), (2, 2, NULL, NULL, 10)`);
   });
   res.json({ status: 'Örnek veriler eklendi.' });
+});
+
+// --- SUMMARY endpoint ---
+app.get('/api/summary', (req, res) => {
+  const today = new Date().toISOString().slice(0, 10);
+  db.serialize(() => {
+    db.get('SELECT COUNT(*) as count FROM Members', [], (err, row1) => {
+      if (err) return res.status(500).json({ error: err.message });
+      db.get('SELECT COUNT(*) as count FROM Members WHERE registration_date=?', [today], (err, row2) => {
+        if (err) return res.status(500).json({ error: err.message });
+        db.get('SELECT COUNT(*) as count FROM Classes WHERE date=?', [today], (err, row3) => {
+          if (err) return res.status(500).json({ error: err.message });
+          res.json({
+            total_members: row1.count,
+            new_members: row2.count,
+            today_classes: row3.count
+          });
+        });
+      });
+    });
+  });
 });
 
 app.listen(PORT, () => {
