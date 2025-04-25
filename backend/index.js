@@ -22,6 +22,22 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
 
 // --- Classes ve Attendance tabloları için migration ---
 db.serialize(() => {
+  // Salon table
+  db.run(`CREATE TABLE IF NOT EXISTS Salon (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    name TEXT,
+    address TEXT,
+    phone TEXT,
+    logo TEXT,
+    theme_color TEXT,
+    admin_password TEXT
+  )`);
+  db.get('SELECT COUNT(*) as count FROM Salon', [], (err, row) => {
+    if (!err && row.count === 0) {
+      db.run('INSERT INTO Salon (id, name, address, phone, logo, theme_color, admin_password) VALUES (1, "", "", "", "", "#1565c0", "admin")');
+    }
+  });
+
   db.run(`CREATE TABLE IF NOT EXISTS Classes (
     class_id INTEGER PRIMARY KEY AUTOINCREMENT,
     branch_id INTEGER NOT NULL,
@@ -44,6 +60,39 @@ db.serialize(() => {
   )`);
   db.run(`CREATE INDEX IF NOT EXISTS idx_attendance_class_member ON Attendance(class_id, member_id)`);
   db.run(`CREATE UNIQUE INDEX IF NOT EXISTS idx_attendance_unique ON Attendance(class_id, member_id)`);
+});
+
+// Salon bilgisi getir
+app.get('/api/salon', (req, res) => {
+  db.get('SELECT * FROM Salon WHERE id=1', [], (err, row) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(row);
+  });
+});
+
+// Salon bilgisi güncelle
+app.put('/api/salon', (req, res) => {
+  const { name, address, phone, logo, theme_color, admin_password } = req.body;
+  db.run(
+    `UPDATE Salon SET name=?, address=?, phone=?, logo=?, theme_color=?, admin_password=? WHERE id=1`,
+    [name, address, phone, logo, theme_color, admin_password],
+    function (err) {
+      if (err) return res.status(500).json({ error: err.message });
+      if (this.changes === 0) {
+        // upsert
+        db.run(
+          'INSERT INTO Salon (id, name, address, phone, logo, theme_color, admin_password) VALUES (1,?,?,?,?,?,?)',
+          [name, address, phone, logo, theme_color, admin_password],
+          function (err2) {
+            if (err2) return res.status(500).json({ error: err2.message });
+            res.json({ updated: true, upserted: true });
+          }
+        );
+      } else {
+        res.json({ updated: true });
+      }
+    }
+  );
 });
 
 // Üyeleri listele
@@ -406,6 +455,46 @@ app.post('/api/seed', (req, res) => {
     db.run(`INSERT INTO Member_Packages (member_id, package_id, start_date, end_date, classes_remaining) VALUES (1, 1, '2025-04-20', '2025-05-20', NULL), (2, 2, NULL, NULL, 10)`);
   });
   res.json({ status: 'Örnek veriler eklendi.' });
+});
+
+// --- Attendance Report endpoint ---
+app.get('/api/reports/attendance/', (req, res) => {
+  const { member_id, start_date, end_date } = req.query;
+  let params = [];
+  let where = 'WHERE 1=1';
+  if (member_id) {
+    where += ' AND m.member_id = ?';
+    params.push(member_id);
+  }
+  if (start_date) {
+    where += ' AND c.date >= ?';
+    params.push(start_date);
+  }
+  if (end_date) {
+    where += ' AND c.date <= ?';
+    params.push(end_date);
+  }
+  // Her üye için katıldığı ders tarihlerini ve toplamını getir
+  const sql = `
+    SELECT m.member_id, m.name as member_name, 
+      GROUP_CONCAT(c.date, ', ') as dates_attended,
+      COUNT(a.attendance_id) as total_sessions
+    FROM Attendance a
+    JOIN Members m ON a.member_id = m.member_id
+    JOIN Classes c ON a.class_id = c.class_id
+    ${where}
+    GROUP BY m.member_id, m.name
+    ORDER BY m.name
+  `;
+  db.all(sql, params, (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    // Parse dates_attended to array
+    const result = rows.map(r => ({
+      ...r,
+      dates_attended: r.dates_attended ? r.dates_attended.split(', ') : [],
+    }));
+    res.json(result);
+  });
 });
 
 // --- SUMMARY endpoint ---

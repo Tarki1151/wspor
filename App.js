@@ -1,4 +1,5 @@
 import * as React from 'react';
+import LoginScreen from './screens/LoginScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
@@ -60,37 +61,44 @@ function PaketlerStackScreen() {
 }
 
 export default function App() {
+  const [loggedIn, setLoggedIn] = React.useState(false);
+
   return (
     <NavigationContainer>
       <StatusBar style="auto" />
-      <Tab.Navigator
-        initialRouteName="Anasayfa"
-        screenOptions={({ route }) => ({
-          headerShown: false,
-          tabBarActiveTintColor: '#1565c0',
-          tabBarInactiveTintColor: 'gray',
-          tabBarStyle: { paddingBottom: 6, height: 60 },
-          tabBarIcon: ({ color, size }) => {
-            let iconName;
-            if (route.name === 'Anasayfa') iconName = 'home';
-            else if (route.name === 'Üyeler') iconName = 'people';
-            else if (route.name === 'Branşlar') iconName = 'fitness-outline';
-            else if (route.name === 'Paketler') iconName = 'gift-outline';
-            else if (route.name === 'Takvim') iconName = 'calendar';
-            else if (route.name === 'Raporlar') iconName = 'bar-chart';
-            else if (route.name === 'Profil') iconName = 'person';
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-        })}
-      >
-        <Tab.Screen name="Anasayfa" component={AnasayfaScreen} options={{ headerShown: true, tabBarLabel: 'Anasayfa', tabBarIcon: ({ color, size }) => (<Ionicons name="home" size={size} color={color} />) }} />
-        <Tab.Screen name="Üyeler" component={UyelerStackScreen} options={{ headerShown: true, tabBarLabel: 'Üyeler', tabBarIcon: ({ color, size }) => (<Ionicons name="people" size={size} color={color} />) }} />
-        <Tab.Screen name="Branşlar" component={BranslarStackScreen} options={{ headerShown: true, tabBarLabel: 'Branşlar', tabBarIcon: ({ color, size }) => (<Ionicons name="fitness-outline" size={size} color={color} />) }} />
-        <Tab.Screen name="Paketler" component={PaketlerStackScreen} options={{ headerShown: true, tabBarLabel: 'Paketler', tabBarIcon: ({ color, size }) => (<Ionicons name="gift-outline" size={size} color={color} />) }} />
-        <Tab.Screen name="Takvim" component={TakvimScreen} options={{ headerShown: true, tabBarLabel: 'Takvim', tabBarIcon: ({ color, size }) => (<Ionicons name="calendar" size={size} color={color} />) }} />
-        <Tab.Screen name="Raporlar" component={RaporlarScreen} options={{ headerShown: true, tabBarLabel: 'Raporlar', tabBarIcon: ({ color, size }) => (<Ionicons name="bar-chart" size={size} color={color} />) }} />
-        <Tab.Screen name="Profil" component={ProfilScreen} options={{ headerShown: true, tabBarLabel: 'Profil', tabBarIcon: ({ color, size }) => (<Ionicons name="person" size={size} color={color} />) }} />
-      </Tab.Navigator>
+      {loggedIn ? (
+        <Tab.Navigator
+          initialRouteName="Anasayfa"
+          screenOptions={({ route }) => ({
+            headerShown: false,
+            tabBarActiveTintColor: '#1565c0',
+            tabBarInactiveTintColor: 'gray',
+            tabBarStyle: { paddingBottom: 6, height: 60 },
+            tabBarIcon: ({ color, size }) => {
+              let iconName;
+              if (route.name === 'Anasayfa') iconName = 'home';
+              else if (route.name === 'Üyeler') iconName = 'people';
+              else if (route.name === 'Branşlar') iconName = 'fitness-outline';
+              else if (route.name === 'Paketler') iconName = 'gift-outline';
+              else if (route.name === 'Takvim') iconName = 'calendar';
+              else if (route.name === 'Raporlar') iconName = 'bar-chart';
+              else if (route.name === 'Profil') iconName = 'person';
+              return <Ionicons name={iconName} size={size} color={color} />;
+            },
+          })}
+        >
+          <Tab.Screen name="Anasayfa" component={AnasayfaScreen} options={{ headerShown: true, tabBarLabel: 'Anasayfa', tabBarIcon: ({ color, size }) => (<Ionicons name="home" size={size} color={color} />) }} />
+          <Tab.Screen name="Üyeler" component={UyelerStackScreen} options={{ headerShown: true, tabBarLabel: 'Üyeler', tabBarIcon: ({ color, size }) => (<Ionicons name="people" size={size} color={color} />) }} />
+          <Tab.Screen name="Branşlar" component={BranslarStackScreen} options={{ headerShown: true, tabBarLabel: 'Branşlar', tabBarIcon: ({ color, size }) => (<Ionicons name="fitness-outline" size={size} color={color} />) }} />
+          <Tab.Screen name="Paketler" component={PaketlerStackScreen} options={{ headerShown: true, tabBarLabel: 'Paketler', tabBarIcon: ({ color, size }) => (<Ionicons name="gift-outline" size={size} color={color} />) }} />
+          <Tab.Screen name="Takvim" component={TakvimScreen} options={{ headerShown: true, tabBarLabel: 'Takvim', tabBarIcon: ({ color, size }) => (<Ionicons name="calendar" size={size} color={color} />) }} />
+          <Tab.Screen name="Raporlar" component={RaporlarScreen} options={{ headerShown: true, tabBarLabel: 'Raporlar', tabBarIcon: ({ color, size }) => (<Ionicons name="bar-chart" size={size} color={color} />) }} />
+          <Tab.Screen name="Profil" component={ProfilScreen} options={{ headerShown: true, tabBarLabel: 'Profil', tabBarIcon: ({ color, size }) => (<Ionicons name="person" size={size} color={color} />) }} />
+        </Tab.Navigator>
+      ) : (
+        <LoginScreen onLogin={() => setLoggedIn(true)} />
+      )}
     </NavigationContainer>
   );
 }
+

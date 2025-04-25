@@ -166,7 +166,7 @@ export default function RaporlarScreen() {
               <View key={row.member_id ? `attendance-${row.member_id}` : `attendance-${idx}`} style={styles.tableRow}>
                 <Text style={styles.tableCell}>{row.member_name}</Text>
                 <Text style={styles.tableCell}>{row.dates_attended?.join(', ')}</Text>
-                <Text style={styles.tableCell}>{row.total_sessions}</Text>
+                <Text style={[styles.tableCell, styles.tableCellCenter]}>{row.total_sessions}</Text>
               </View>
             ))
           )}
@@ -330,6 +330,11 @@ const styles = StyleSheet.create({
   tableCell: {
     flex: 1,
     minWidth: 90,
+  },
+  tableCellCenter: {
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   tableEmpty: {
     padding: 12,
