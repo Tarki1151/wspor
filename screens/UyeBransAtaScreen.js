@@ -12,7 +12,7 @@ export default function UyeBransAtaScreen({ route, navigation }) {
       setLoading(true);
       setHata(null);
       try {
-        const resp = await fetch('http://localhost:4000/api/branches');
+        const resp = await fetch('https://wspor.onrender.com/api/branches');
         if (!resp.ok) throw new Error('Sunucu hatası');
         setBranslar(await resp.json());
       } catch (err) {
@@ -26,7 +26,7 @@ export default function UyeBransAtaScreen({ route, navigation }) {
 
   const handleAta = async (branch_id) => {
     try {
-      const resp = await fetch('http://localhost:4000/api/member-branches', {
+      const resp = await fetch('https://wspor.onrender.com/api/member-branches', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ member_id: memberId, branch_id }),

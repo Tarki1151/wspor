@@ -9,7 +9,7 @@ export default function LoginScreen({ navigation, onLogin }) {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch('http://localhost:4000/api/salon')
+    fetch('https://wspor.onrender.com/api/salon')
       .then(res => res.json())
       .then(data => {
         if (data && data.logo) setLogo(data.logo);

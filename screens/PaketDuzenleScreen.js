@@ -13,7 +13,7 @@ export default function PaketDuzenleScreen({ route, navigation }) {
   useEffect(() => {
     const fetchPaket = async () => {
       try {
-        const resp = await fetch('http://localhost:4000/api/packages');
+        const resp = await fetch('https://wspor.onrender.com/api/packages');
         const data = await resp.json();
         const found = data.find(p => p.package_id === packageId);
         if (found) {
@@ -34,7 +34,7 @@ export default function PaketDuzenleScreen({ route, navigation }) {
   const handleKaydet = async () => {
     if (!name) return Alert.alert('Uyarı', 'Paket adı zorunludur');
     try {
-      const resp = await fetch(`http://localhost:4000/api/packages/${packageId}`, {
+      const resp = await fetch(`https://wspor.onrender.com/api/packages/${packageId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -97,7 +97,7 @@ export default function PaketDuzenleScreen({ route, navigation }) {
 // Silme fonksiyonu
 async function handleSil() {
   try {
-    const resp = await fetch(`http://localhost:4000/api/packages/${packageId}`, {
+    const resp = await fetch(`https://wspor.onrender.com/api/packages/${packageId}`, {
       method: 'DELETE',
     });
     if (!resp.ok) throw new Error('Sunucu hatası');

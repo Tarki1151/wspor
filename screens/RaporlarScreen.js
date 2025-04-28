@@ -33,7 +33,7 @@ export default function RaporlarScreen() {
 
   // Fetch members for filter
   useEffect(() => {
-    fetch('http://localhost:4000/api/members/')
+    fetch('https://wspor.onrender.com/api/members/')
       .then(res => res.json())
       .then(data => setMembers(data))
       .catch(() => setMembers([]));
@@ -63,7 +63,7 @@ export default function RaporlarScreen() {
     if (startDate) params.push(`start_date=${formatDate(startDate)}`);
     if (endDate) params.push(`end_date=${formatDate(endDate)}`);
     if (activeTab === 'attendance') {
-      url = `http://localhost:4000/api/reports/attendance/?${params.join('&')}`;
+      url = `https://wspor.onrender.com/api/reports/attendance/?${params.join('&')}`;
       fetch(url)
         .then(res => res.json())
         .then(data => {
@@ -76,7 +76,7 @@ export default function RaporlarScreen() {
           setLoading(false);
         });
     } else if (activeTab === 'payments') {
-      url = `http://localhost:4000/api/reports/payments/?${params.join('&')}`;
+      url = `https://wspor.onrender.com/api/reports/payments/?${params.join('&')}`;
       fetch(url)
         .then(res => res.json())
         .then(data => {

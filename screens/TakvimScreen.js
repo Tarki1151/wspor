@@ -32,7 +32,7 @@ export default function TakvimScreen() {
 
   // Üyeleri getir
   useEffect(() => {
-    fetch('http://localhost:4000/api/members')
+    fetch('https://wspor.onrender.com/api/members')
       .then(res => res.json())
       .then(data => setMembers(data));
   }, []);
@@ -50,7 +50,7 @@ export default function TakvimScreen() {
 
   // Branşları getir
   useEffect(() => {
-    fetch('http://localhost:4000/api/branches')
+    fetch('https://wspor.onrender.com/api/branches')
       .then(res => res.json())
       .then(data => {
         setBranches(data);
@@ -62,12 +62,12 @@ export default function TakvimScreen() {
   const fetchClassesAndAttendance = async () => {
     if (!selectedBranch || !selectedDate) return;
     setLoading(true);
-    const res = await fetch(`http://localhost:4000/api/classes?branch_id=${selectedBranch}&date=${selectedDate}`);
+    const res = await fetch(`https://wspor.onrender.com/api/classes?branch_id=${selectedBranch}&date=${selectedDate}`);
     const data = await res.json();
     setClasses(data);
     const attMap = {};
     await Promise.all(data.map(async (cls) => {
-      const resp = await fetch(`http://localhost:4000/api/classes/${cls.class_id}/attendance`);
+      const resp = await fetch(`https://wspor.onrender.com/api/classes/${cls.class_id}/attendance`);
       const att = await resp.json();
       attMap[cls.class_id] = att.filter(a => a.attended).map(a => a.member_name);
     }));
@@ -147,7 +147,7 @@ export default function TakvimScreen() {
                     // Mevcut yoklama üyelerini çek
                     let member_ids = [];
                     try {
-                      const resp = await fetch(`http://localhost:4000/api/classes/${cls.class_id}/attendance`);
+                      const resp = await fetch(`https://wspor.onrender.com/api/classes/${cls.class_id}/attendance`);
                       const att = await resp.json();
                       member_ids = att.filter(a => a.attended).map(a => a.member_id);
                     } catch {}
@@ -169,7 +169,7 @@ export default function TakvimScreen() {
                       confirm = true; // Mobilde doğrudan sil (örnek amaçlı)
                     }
                     if (confirm) {
-                      await fetch(`http://localhost:4000/api/classes/${cls.class_id}`, { method: 'DELETE' });
+                      await fetch(`https://wspor.onrender.com/api/classes/${cls.class_id}`, { method: 'DELETE' });
                       await fetchClassesAndAttendance();
                     }
                   }} color="#d32f2f" />
@@ -226,7 +226,7 @@ export default function TakvimScreen() {
                   setSaving(true);
                   let class_id = editClassId;
                   if (editMode && editClassId) {
-                    await fetch(`http://localhost:4000/api/classes/${editClassId}`, {
+                    await fetch(`https://wspor.onrender.com/api/classes/${editClassId}`, {
                       method: 'PUT',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
@@ -237,7 +237,7 @@ export default function TakvimScreen() {
                     });
                   } else {
                     // Yeni ders ekle
-                    const resp = await fetch('http://localhost:4000/api/classes', {
+                    const resp = await fetch('https://wspor.onrender.com/api/classes', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
@@ -250,7 +250,7 @@ export default function TakvimScreen() {
                     class_id = data.class_id;
                   }
                   // Yoklama kaydı oluştur/güncelle
-                  await fetch(`http://localhost:4000/api/classes/${class_id}/attendance`, {
+                  await fetch(`https://wspor.onrender.com/api/classes/${class_id}/attendance`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ attendance: members.map(m => ({ member_id: m.member_id, attended: newClass.member_ids.includes(m.member_id) ? 1 : 0 })) })

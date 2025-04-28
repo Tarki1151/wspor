@@ -14,7 +14,7 @@ export default function YoklamaScreen({ route, navigation }) {
       navigation.goBack();
       return;
     }
-    fetch(`http://localhost:4000/api/classes/${classId}/attendance`)
+    fetch(`https://wspor.onrender.com/api/classes/${classId}/attendance`)
       .then(res => res.json())
       .then(data => setAttendance(data))
       .finally(() => setLoading(false));
@@ -32,7 +32,7 @@ export default function YoklamaScreen({ route, navigation }) {
       return;
     }
     setSaving(true);
-    await fetch(`http://localhost:4000/api/classes/${classId}/attendance`, {
+    await fetch(`https://wspor.onrender.com/api/classes/${classId}/attendance`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ attendance: attendance.map(a => ({ member_id: a.member_id, attended: a.attended })) })

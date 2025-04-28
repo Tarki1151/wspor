@@ -10,7 +10,7 @@ export default function BransDuzenleScreen({ route, navigation }) {
   useEffect(() => {
     const fetchBrans = async () => {
       try {
-        const resp = await fetch('http://localhost:4000/api/branches');
+        const resp = await fetch('https://wspor.onrender.com/api/branches');
         const data = await resp.json();
         const found = data.find(b => b.branch_id === branchId);
         if (found) {
@@ -28,7 +28,7 @@ export default function BransDuzenleScreen({ route, navigation }) {
   const handleKaydet = async () => {
     if (!name) return Alert.alert('Uyarı', 'Branş adı zorunludur');
     try {
-      const resp = await fetch(`http://localhost:4000/api/branches/${branchId}`, {
+      const resp = await fetch(`https://wspor.onrender.com/api/branches/${branchId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, description }),
@@ -44,7 +44,7 @@ export default function BransDuzenleScreen({ route, navigation }) {
   // Silme fonksiyonu doğru yerde
   const handleSil = async () => {
     try {
-      const resp = await fetch(`http://localhost:4000/api/branches/${branchId}`, {
+      const resp = await fetch(`https://wspor.onrender.com/api/branches/${branchId}`, {
         method: 'DELETE',
       });
       if (!resp.ok) throw new Error('Sunucu hatası');

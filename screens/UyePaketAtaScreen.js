@@ -23,11 +23,11 @@ export default function UyePaketAtaScreen({ route, navigation }) {
       setHata(null);
       try {
         // Tüm paketler
-        const resp1 = await fetch('http://localhost:4000/api/packages');
+        const resp1 = await fetch('https://wspor.onrender.com/api/packages');
         if (!resp1.ok) throw new Error('Sunucu hatası');
         const paketlerData = await resp1.json();
         // Mevcut paketler (üyeye atanmış)
-        const resp2 = await fetch(`http://localhost:4000/api/member-packages/${memberId}`);
+        const resp2 = await fetch(`https://wspor.onrender.com/api/member-packages/${memberId}`);
         if (!resp2.ok) throw new Error('Sunucu hatası');
         const mevcut = await resp2.json();
         if (isActive) {
@@ -57,7 +57,7 @@ export default function UyePaketAtaScreen({ route, navigation }) {
       const today = new Date();
       const start_date = today.toISOString().slice(0, 10);
       const end_date = new Date(today.setMonth(today.getMonth() + 1)).toISOString().slice(0, 10);
-      const resp = await fetch('http://localhost:4000/api/member-packages', {
+      const resp = await fetch('https://wspor.onrender.com/api/member-packages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ member_id: memberId, package_id: seciliPaket, start_date, end_date, classes_remaining: null }),
@@ -109,7 +109,7 @@ async function handleSilMemberPackage(memberPackageId) {
       { text: 'Vazgeç', style: 'cancel' },
       { text: 'Sil', style: 'destructive', onPress: async () => {
         try {
-          const resp = await fetch(`http://localhost:4000/api/member-packages/${memberPackageId}`, {
+          const resp = await fetch(`https://wspor.onrender.com/api/member-packages/${memberPackageId}`, {
             method: 'DELETE',
           });
           if (!resp.ok) throw new Error('Sunucu hatası');

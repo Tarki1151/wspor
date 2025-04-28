@@ -45,15 +45,15 @@ export default function UyeDetayScreen({ route }) {
       setHata(null);
       try {
         // Üye bilgisi
-        const uyeResp = await fetch(`http://localhost:4000/api/members?q=`);
+        const uyeResp = await fetch(`https://wspor.onrender.com/api/members?q=`);
         const uyeData = await uyeResp.json();
         const found = uyeData.find(u => u.member_id === memberId);
         setUye(found);
         // Branşlar
-        const bransResp = await fetch(`http://localhost:4000/api/member-branches/${memberId}`);
+        const bransResp = await fetch(`https://wspor.onrender.com/api/member-branches/${memberId}`);
         setBranslar(await bransResp.json());
         // Paketler
-        const paketResp = await fetch(`http://localhost:4000/api/member-packages/${memberId}`);
+        const paketResp = await fetch(`https://wspor.onrender.com/api/member-packages/${memberId}`);
         setPaketler(await paketResp.json());
       } catch (err) {
         setHata(err.message);
@@ -68,7 +68,7 @@ export default function UyeDetayScreen({ route }) {
   const fetchOdemeler = async () => {
     setOdemelerLoading(true);
     try {
-      const resp = await fetch(`http://localhost:4000/api/reports/payments/?member_id=${memberId}`);
+      const resp = await fetch(`https://wspor.onrender.com/api/reports/payments/?member_id=${memberId}`);
       if (!resp.ok) throw new Error('Ödemeler alınamadı');
       const data = await resp.json();
       setOdemeler(data);
@@ -89,7 +89,7 @@ export default function UyeDetayScreen({ route }) {
       };
       if (odemeTarih) body.payment_date = odemeTarih;
       if (odemeAciklama) body.description = odemeAciklama;
-      const resp = await fetch('http://localhost:4000/api/payments', {
+      const resp = await fetch('https://wspor.onrender.com/api/payments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -133,7 +133,7 @@ export default function UyeDetayScreen({ route }) {
               style={styles.deleteXButton}
               onPress={async () => {
                 try {
-                  const resp = await fetch(`http://localhost:4000/api/member-branches/${b.branch_id}?member_id=${memberId}`, {
+                  const resp = await fetch(`https://wspor.onrender.com/api/member-branches/${b.branch_id}?member_id=${memberId}`, {
                     method: 'DELETE',
                   });
                   if (!resp.ok) throw new Error('Sunucu hatası');
@@ -170,7 +170,7 @@ export default function UyeDetayScreen({ route }) {
               style={styles.deleteXButton}
               onPress={async () => {
                 try {
-                  const resp = await fetch(`http://localhost:4000/api/member-packages/${p.member_package_id}`, {
+                  const resp = await fetch(`https://wspor.onrender.com/api/member-packages/${p.member_package_id}`, {
                     method: 'DELETE',
                   });
                   if (!resp.ok) throw new Error('Sunucu hatası');

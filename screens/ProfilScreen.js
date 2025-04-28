@@ -14,7 +14,7 @@ export default function ProfilScreen() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch('http://localhost:4000/api/salon')
+    fetch('https://wspor.onrender.com/api/salon')
       .then(r => r.json())
       .then(data => {
         setSalon({
@@ -33,7 +33,7 @@ export default function ProfilScreen() {
     setSaving(true);
     setError('');
     const { theme_color, ...salonData } = salon;
-    fetch('http://localhost:4000/api/salon', {
+    fetch('https://wspor.onrender.com/api/salon', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(salonData),

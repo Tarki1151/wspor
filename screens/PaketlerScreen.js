@@ -23,7 +23,7 @@ export default function PaketlerScreen() {
       setLoading(true);
       setHata(null);
       try {
-        const resp = await fetch('http://localhost:4000/api/packages');
+        const resp = await fetch('https://wspor.onrender.com/api/packages');
         if (!resp.ok) throw new Error('Sunucu hatası');
         const data = await resp.json();
         setPaketler(data);

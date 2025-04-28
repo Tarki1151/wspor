@@ -15,7 +15,7 @@ export default function UyeDuzenleScreen({ route, navigation }) {
   useEffect(() => {
     const fetchUye = async () => {
       try {
-        const resp = await fetch('http://localhost:4000/api/members?q=');
+        const resp = await fetch('https://wspor.onrender.com/api/members?q=');
         const data = await resp.json();
         const found = data.find(u => u.member_id === memberId);
         if (found) {
@@ -37,7 +37,7 @@ export default function UyeDuzenleScreen({ route, navigation }) {
   const handleKaydet = async () => {
     if (!name) return Alert.alert('Uyarı', 'İsim zorunludur');
     try {
-      const resp = await fetch(`http://localhost:4000/api/members/${memberId}`, {
+      const resp = await fetch(`https://wspor.onrender.com/api/members/${memberId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, phone, email, address, date_of_birth: dateOfBirth, registration_date: uye?.registration_date || new Date().toISOString().slice(0, 10), note }),
@@ -86,7 +86,7 @@ export default function UyeDuzenleScreen({ route, navigation }) {
 // Silme fonksiyonu
 async function handleSil() {
   try {
-    const resp = await fetch(`http://localhost:4000/api/members/${memberId}`, {
+    const resp = await fetch(`https://wspor.onrender.com/api/members/${memberId}`, {
       method: 'DELETE',
     });
     if (!resp.ok) throw new Error('Sunucu hatası');

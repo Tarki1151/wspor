@@ -23,7 +23,7 @@ export default function BranslarScreen() {
       setLoading(true);
       setHata(null);
       try {
-        const resp = await fetch('http://localhost:4000/api/branches');
+        const resp = await fetch('https://wspor.onrender.com/api/branches');
         if (!resp.ok) throw new Error('Sunucu hatası');
         const data = await resp.json();
         setBranslar(data);

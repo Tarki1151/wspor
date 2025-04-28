@@ -13,7 +13,7 @@ export default function UyeEkleScreen({ navigation }) {
   const handleEkle = async () => {
     if (!name) return Alert.alert('Uyarı', 'İsim zorunludur');
     try {
-      const resp = await fetch('http://localhost:4000/api/members', {
+      const resp = await fetch('https://wspor.onrender.com/api/members', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, phone, email, address, date_of_birth: dateOfBirth, registration_date: new Date().toISOString().slice(0, 10), note }),

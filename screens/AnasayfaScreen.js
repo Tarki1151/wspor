@@ -8,14 +8,14 @@ export default function AnasayfaScreen() {
   const [logo, setLogo] = React.useState(null);
 
   React.useEffect(() => {
-    fetch('http://localhost:4000/api/summary')
+    fetch('https://wspor.onrender.com/api/summary')
       .then(res => res.json())
       .then(data => setSummary(data))
       .catch(() => setSummary({ total_members: '-', new_members: '-', today_classes: '-' }));
   }, []);
 
   React.useEffect(() => {
-    fetch('http://localhost:4000/api/salon')
+    fetch('https://wspor.onrender.com/api/salon')
       .then(res => res.json())
       .then(data => {
         if (data && data.logo) setLogo(data.logo);

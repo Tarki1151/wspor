@@ -8,7 +8,7 @@ export default function BransEkleScreen({ navigation }) {
   const handleEkle = async () => {
     if (!name) return Alert.alert('Uyarı', 'Branş adı zorunludur');
     try {
-      const resp = await fetch('http://localhost:4000/api/branches', {
+      const resp = await fetch('https://wspor.onrender.com/api/branches', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, description }),
