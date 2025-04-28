@@ -1,0 +1,5 @@
+package_id,name,type,duration_days,num_classes,price
+1,"Aylık Sınırsız",duration,,,10000.0
+2,"8 Derslik",class,,8,6000.0
+3,"Aylık Sınırsız",duration,30,,800.0
+4,"10 Derslik",class,,10,600.0

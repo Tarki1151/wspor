@@ -1,0 +1,8 @@
+member_id,name,phone,email,address,date_of_birth,registration_date
+1,"Ali Veli",5551112233,ali@spor.com,"İstanbul",1990-01-01,2025-04-20
+2,"Zeynep Korkmaza",5552223344,zeynep@spor.com,Ankara,1992-05-12,2025-04-20
+3,"Mehmet Yıldız",5553334455,mehmet@spor.com,"İzmir",1988-03-08,2025-04-20
+4,"Tarkan ÇİÇEK",5337134328,tarkan.cicek@gmail.com,Sariyer,1972-01-01,2025-04-20
+5,"Zeynep Korkmaz",5552223344,zeynep@spor.com,Ankara,1992-05-12,2025-04-20
+6,"Mehmet Yıldız",5553334455,mehmet@spor.com,"İzmir",1988-03-08,2025-04-20
+7,"Başak ÇİÇEK",5325672995,basak.cicek@icloud.com,"Cumhuriyet Mah.",1975-10-18,2025-04-21

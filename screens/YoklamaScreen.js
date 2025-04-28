@@ -7,7 +7,13 @@ export default function YoklamaScreen({ route, navigation }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  // classId kontrolü
   useEffect(() => {
+    if (!classId) {
+      Alert.alert('Hata', 'Ders (class) bilgisi eksik!');
+      navigation.goBack();
+      return;
+    }
     fetch(`http://localhost:4000/api/classes/${classId}/attendance`)
       .then(res => res.json())
       .then(data => setAttendance(data))
@@ -21,6 +27,10 @@ export default function YoklamaScreen({ route, navigation }) {
   };
 
   const handleSave = async () => {
+    if (!classId) {
+      Alert.alert('Hata', 'Ders (class) bilgisi eksik!');
+      return;
+    }
     setSaving(true);
     await fetch(`http://localhost:4000/api/classes/${classId}/attendance`, {
       method: 'POST',
@@ -31,6 +41,7 @@ export default function YoklamaScreen({ route, navigation }) {
     Alert.alert('Başarılı', 'Yoklama kaydedildi.');
     navigation.goBack();
   };
+
 
   return (
     <View style={styles.container}>

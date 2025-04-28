@@ -1,11 +1,24 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Image } from 'react-native';
 
 export default function LoginScreen({ navigation, onLogin }) {
+  const [logo, setLogo] = useState(null);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetch('http://localhost:4000/api/salon')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.logo) setLogo(data.logo);
+        else setLogo(null);
+      })
+      .catch(() => setLogo(null));
+  }, []);
+
+  const logoSource = logo && logo.startsWith('data:') ? { uri: logo } : logo && logo.startsWith('http') ? { uri: logo } : require('../assets/TARABYA MARTE-250x.png');
 
   const handleLogin = async () => {
     setLoading(true);
@@ -23,6 +36,7 @@ export default function LoginScreen({ navigation, onLogin }) {
 
   return (
     <View style={styles.container}>
+      <Image source={logoSource} style={styles.logo} resizeMode="contain" />
       <Text style={styles.title}>Giriş Yap</Text>
       <TextInput
         style={styles.input}
@@ -53,6 +67,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#f5f5f5',
     padding: 16,
+  },
+  logo: {
+    width: 120,
+    height: 120,
+    marginBottom: 16,
+    alignSelf: 'center',
+    marginTop: 16,
   },
   title: {
     fontSize: 24,

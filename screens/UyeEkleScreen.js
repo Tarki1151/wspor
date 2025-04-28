@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView } from 'react-native';
+import GunSecici from '../components/GunSecici';
 
 export default function UyeEkleScreen({ navigation }) {
   const [name, setName] = useState('');
@@ -7,6 +8,7 @@ export default function UyeEkleScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
+  const [note, setNote] = useState('');
 
   const handleEkle = async () => {
     if (!name) return Alert.alert('Uyarı', 'İsim zorunludur');
@@ -14,7 +16,7 @@ export default function UyeEkleScreen({ navigation }) {
       const resp = await fetch('http://localhost:4000/api/members', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, phone, email, address, date_of_birth: dateOfBirth, registration_date: new Date().toISOString().slice(0, 10) }),
+        body: JSON.stringify({ name, phone, email, address, date_of_birth: dateOfBirth, registration_date: new Date().toISOString().slice(0, 10), note }),
       });
       if (!resp.ok) throw new Error('Sunucu hatası');
       Alert.alert('Başarılı', 'Üye eklendi');
@@ -31,7 +33,14 @@ export default function UyeEkleScreen({ navigation }) {
       <TextInput style={styles.input} placeholder="Telefon" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
       <TextInput style={styles.input} placeholder="E-posta" value={email} onChangeText={setEmail} keyboardType="email-address" />
       <TextInput style={styles.input} placeholder="Adres" value={address} onChangeText={setAddress} />
-      <TextInput style={styles.input} placeholder="Doğum Tarihi (YYYY-MM-DD)" value={dateOfBirth} onChangeText={setDateOfBirth} />
+      <GunSecici value={dateOfBirth} onChange={val => {
+        if (val === 'SELECT_FROM_TAKVIM') {
+          navigation.navigate('Takvim', { onSelectDate: (dateStr) => setDateOfBirth(dateStr) });
+        } else {
+          setDateOfBirth(val);
+        }
+      }} />
+      <TextInput style={styles.input} placeholder="Not" value={note} onChangeText={setNote} multiline />
       <Button title="Ekle" onPress={handleEkle} color="#1565c0" />
 
     </ScrollView>

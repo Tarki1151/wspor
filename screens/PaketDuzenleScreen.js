@@ -20,7 +20,7 @@ export default function PaketDuzenleScreen({ route, navigation }) {
           setPaket(found);
           setName(found.name || '');
           setType(found.type || 'duration');
-          setDuration(found.duration ? String(found.duration) : '');
+          setDuration(found.duration_days ? String(found.duration_days) : '');
           setNumClasses(found.num_classes ? String(found.num_classes) : '');
           setPrice(found.price ? String(found.price) : '');
         }

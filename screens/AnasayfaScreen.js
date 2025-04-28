@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, Button, Image } from 'react-native';
-
 import { useNavigation } from '@react-navigation/native';
 
 export default function AnasayfaScreen() {
   const navigation = useNavigation();
   const [summary, setSummary] = React.useState({ total_members: '...', new_members: '...', today_classes: '...' });
+  const [logo, setLogo] = React.useState(null);
 
   React.useEffect(() => {
     fetch('http://localhost:4000/api/summary')
@@ -14,9 +14,21 @@ export default function AnasayfaScreen() {
       .catch(() => setSummary({ total_members: '-', new_members: '-', today_classes: '-' }));
   }, []);
 
+  React.useEffect(() => {
+    fetch('http://localhost:4000/api/salon')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.logo) setLogo(data.logo);
+        else setLogo(null);
+      })
+      .catch(() => setLogo(null));
+  }, []);
+
+  const logoSource = logo && logo.startsWith('data:') ? { uri: logo } : logo && logo.startsWith('http') ? { uri: logo } : require('../assets/TARABYA MARTE-250x.png');
+
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/TARABYA MARTE-250x.png')} style={styles.logo} resizeMode="contain" />
+      <Image source={logoSource} style={styles.logo} resizeMode="contain" />
       <Text style={styles.title}>Hoşgeldiniz!</Text>
       <Text style={styles.subtitle}>Bugünkü Özet</Text>
       <View style={styles.summaryBox}>
@@ -27,7 +39,7 @@ export default function AnasayfaScreen() {
       <View style={styles.buttonGroup}>
         <View style={styles.buttonWrapper}><Button title="Yeni Üye Ekle" onPress={() => navigation.navigate('Üyeler', { screen: 'UyeEkle' })} /></View>
         <View style={styles.buttonWrapper}><Button title="Ders Planla" onPress={() => navigation.navigate('Takvim')} /></View>
-        <View style={styles.buttonWrapper}><Button title="Rapor Oluştur" onPress={() => {}} /></View>
+        <View style={styles.buttonWrapper}><Button title="Rapor Oluştur" onPress={() => navigation.navigate('Raporlar')} /></View>
       </View>
     </View>
   );

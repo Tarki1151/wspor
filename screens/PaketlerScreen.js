@@ -49,7 +49,7 @@ export default function PaketlerScreen() {
             <Text style={styles.name}>{item.name}</Text>
             <Text>Tür: {item.type === 'duration' ? 'Süreli' : 'Derslik'}</Text>
             {item.type === 'duration' ? (
-              <Text>Süre: {item.duration} gün</Text>
+              <Text>Süre: {item.duration_days} gün</Text>
             ) : (
               <Text>Ders: {item.num_classes}</Text>
             )}

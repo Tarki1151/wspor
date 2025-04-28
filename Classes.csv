@@ -1,0 +1,4 @@
+class_id,branch_id,date,time_slot,instructor_id,capacity
+5,5,2025-04-21,morning,,
+6,4,2025-04-21,afternoon,,
+7,5,2025-04-21,afternoon,,

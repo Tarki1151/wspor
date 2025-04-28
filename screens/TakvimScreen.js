@@ -17,7 +17,11 @@ const TIME_SLOT_LABELS = {
   evening: 'Akşam',
 };
 
+import { useRoute, useNavigation } from '@react-navigation/native';
+
 export default function TakvimScreen() {
+  const route = useRoute();
+  const navigation = useNavigation();
   // Modal state
   const [modalVisible, setModalVisible] = useState(false);
   const [editMode, setEditMode] = useState(false); // false: yeni, true: düzenle
@@ -35,6 +39,10 @@ export default function TakvimScreen() {
   const [branches, setBranches] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState();
   const [selectedDate, setSelectedDate] = useState(formatDate(new Date()));
+
+  // Başka ekrandan gün seçimi için
+  const onSelectDate = route.params?.onSelectDate;
+
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [attendanceMap, setAttendanceMap] = useState({}); // {class_id: ["Ali", "Veli"]}
@@ -79,14 +87,30 @@ export default function TakvimScreen() {
         <input
           type="date"
           value={selectedDate}
-          onChange={e => setSelectedDate(e.target.value)}
+          onChange={e => {
+            setSelectedDate(e.target.value);
+            if (onSelectDate) {
+              onSelectDate(e.target.value);
+              setTimeout(() => navigation.goBack(), 200);
+            }
+          }}
           style={{ padding: 8, marginVertical: 8, borderRadius: 6, borderColor: '#ddd', borderWidth: 1 }}
         />
       );
     }
     return (
-      <TouchableOpacity onPress={() => {}} style={{ marginVertical: 8 }}>
+      <TouchableOpacity
+        onPress={async () => {
+          // Mobilde basit: bugünün tarihi seçili, tıklanınca bugünün tarihi döner
+          if (onSelectDate) {
+            onSelectDate(selectedDate);
+            setTimeout(() => navigation.goBack(), 200);
+          }
+        }}
+        style={{ marginVertical: 8 }}
+      >
         <Text style={{ fontSize: 16 }}>{selectedDate}</Text>
+        {onSelectDate && <Text style={{ color: '#1976d2', fontSize: 12 }}>Bu günü seç</Text>}
       </TouchableOpacity>
     );
   };
